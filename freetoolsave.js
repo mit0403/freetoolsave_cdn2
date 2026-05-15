@@ -2,8 +2,19 @@
 // generic initialization....
 //--------------------------------------------------------------
 
+window.onload = function () {
+    // Focus first field without scrolling (avoids scroll jump on reload when autofocus was used)
+    var businessNameEl = document.getElementById('business_name');
+    if (businessNameEl) {
+        businessNameEl.focus({
+            preventScroll: true
+        });
+    }
+}
+
+
 let template_design = 1;        // default standard.. 
-let isInstantSaveCancelled = false; 
+let isInstantSaveCancelled = false;
 
 // ID-to-Number Mapping
 const TEMPLATE_MAP = {
@@ -80,12 +91,14 @@ $(window).scroll(function () {
         btn.removeClass('show');
     }
 });
+
 btn.on('click', function (e) {
     // Prevent default behavior
     e.preventDefault();
     e.stopImmediatePropagation();
 
     // Smooth scroll to top
+    
     window.scrollTo({
         top: 0,
         behavior: 'smooth'
@@ -192,8 +205,7 @@ function updateInvTplHeight() {
 
 /* 🔒 lock scroll properly */
 function lockInvTplScroll() {
-    const scrollBarWidth =
-        window.innerWidth - document.documentElement.clientWidth;
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
     document.body.style.overflow = "hidden";
     document.body.style.paddingRight = scrollBarWidth + "px";
@@ -298,7 +310,7 @@ openBtn.addEventListener("click", (e) => {
     }
 
     const scrollBarWidth = getScrollbarWidth();
-    
+
     document.body.style.overflow = "hidden";
     document.body.style.paddingRight = scrollBarWidth + "px";
 
@@ -525,15 +537,7 @@ window.onclick = () => document.getElementById('countryDropdown').classList.remo
 
 
 
-window.onload = function () {
-    // Focus first field without scrolling (avoids scroll jump on reload when autofocus was used)
-    var businessNameEl = document.getElementById('business_name');
-    if (businessNameEl) {
-        businessNameEl.focus({
-            preventScroll: true
-        });
-    }
-}
+
 
 const jobGroup = document.getElementById('jobRoleGroup');
 const jobTrigger = document.getElementById('jobRoleTrigger');
@@ -813,14 +817,14 @@ $(document).ready(function (e) {
     });
 
 
-   
+
 
     // my code-- meet
     $("#instantSaveBtn").on('click', async function (e) {
         e.preventDefault();
         isInstantSaveCancelled = false;
         lockInvTplScroll();
-        
+
         const $link = $(this);
 
         // 1. Check if it's already "disabled" to prevent double-triggering
@@ -952,7 +956,7 @@ $(document).ready(function (e) {
 
                 // get base64 logo
                 const base64Logo = await getImageData();
-                if (isInstantSaveCancelled) return; 
+                if (isInstantSaveCancelled) return;
 
                 if (base64Logo != {}) {
                     obj['companylogo'] = base64Logo;
@@ -968,7 +972,7 @@ $(document).ready(function (e) {
                     $('.preview-pdf').text("P.O.# " + estimate_form.customer_invoice );
                 }
                 else {
-                    $('.preview-pdf').text(page_name.charAt(0).toUpperCase() + page_name.slice(1).toLowerCase() + "# " + estimate_form.customer_invoice );     // to change pdf title dynamically.
+                    $('.preview-pdf').text(page_name.charAt(0).toUpperCase() + page_name.slice(1).toLowerCase() + "# " + estimate_form.customer_invoice);     // to change pdf title dynamically.
                 }
 
                 window.pdfname = estimate_form.customer_invoice;
@@ -1242,7 +1246,7 @@ $(document).ready(function (e) {
                                 "symbol": "₹",
                                 "code": estimate_form.customer_currency,
                                 "selectedcurrency": estimate_form.customer_currency,
-                                "ammountdue": Number(estimate_form["sub_amout_due[]"]) 
+                                "ammountdue": Number(estimate_form["sub_amout_due[]"])
                             }],
                             "invoice_total": estimate_form["total_with_tax_and_price[]"],
                             // date title 
@@ -1296,7 +1300,7 @@ $(document).ready(function (e) {
                             "business_no": "",
                             "billing_country": estimate_form.billing_country,
                             "billing_pin_code": estimate_form.billing_po,
-                            "billing_address_label": page_name.charAt(0).toUpperCase()+page_name.slice(1) + "To:",
+                            "billing_address_label": page_name.charAt(0).toUpperCase() + page_name.slice(1) + "To:",
                             "billing_address_customer": "",
                             "firstname": "",
                             "lastname": "",
@@ -1410,9 +1414,9 @@ $(document).ready(function (e) {
                                                     tax_types: "%",
                                                     tax_id: "82A4E33B-9598-44BA-A9FF-AA6A77218C01"
                                                 }],
-                                               
+
                                                 // task-amount =dynamic.
-                                                task_amount: ( Number([estimate_form["task_rate[]"]].flat()[i]) + (Number([estimate_form["task_rate[]"]].flat()[i]) * Number([estimate_form["tasktaxrate[]"]].flat()[i])) / 100) * Number([estimate_form["task_quantity[]"]].flat()[i]) || '',
+                                                task_amount: (Number([estimate_form["task_rate[]"]].flat()[i]) + (Number([estimate_form["task_rate[]"]].flat()[i]) * Number([estimate_form["tasktaxrate[]"]].flat()[i])) / 100) * Number([estimate_form["task_quantity[]"]].flat()[i]) || '',
                                                 task_rate: Number([estimate_form["task_rate[]"]].flat()[i]) || '',
                                                 task_quantity: Number([estimate_form["task_quantity[]"]].flat()[i]) || '',
                                                 sac_value: "",
@@ -1470,143 +1474,87 @@ $(document).ready(function (e) {
                             "product_amount_label": "Amount",
                             "product_serial_no_label": "Serial/IMEI",
 
-                            // "product_data": (estimate_form["product_name[]"]) ? [estimate_form["product_name[]"]].flat().map((name,
-                            //     i) => {
-                            //     // 1. Capture the values from parallel arrays using index [i]
-                            //     // We use Number() to ensure calculations work, and || 0 as a fallback
-
-                            //     if (name !== '') {
-
-
-                            //         const qty = Number([estimate_form["quantity[]"]].flat()[
-                            //             i] || '');
-                            //         const total = Number([estimate_form["product_total[]"]]
-                            //             .flat()[i] ||
-                            //             '');
-                            //         // const taxTotal = ( Number([estimate_form["producttaxrate[]"].flat()[i]] * Number([estimate_form["producttaxrate[]"].flat()[i]] ) ) / 100 || '');
-                            //         const taxTotal = (Number(estimate_form["product_total[]"].flat()[i]) * Number(estimate_form["producttaxrate[]"].flat()[i]) / 100) || '';
-                            //         const itemCode = [estimate_form["product_id[]"]].flat() ? [estimate_form["product_id[]"]].flat()[i] : "";
-                            //         const description = [estimate_form["product_description[]"]]
-                            //             .flat()[
-                            //             i
-                            //         ] || "";
-
-                            //         // 2. Calculate Unit Price (Total / Quantity)
-                            //         const unitPrice = qty > 0 ? (total / qty).toFixed(2) :
-                            //             "0.00";
-
-                            //         // 3. Return the row object
-                            //         return {
-                            //             "product_name": name,
-                            //             "product_item_code": itemCode,
-                            //             "hsn_value": "",
-                            //             "serial_no_value": "",
-                            //             "product_quantity": qty.toString(),
-                            //             "product_unit": "",
-                            //             "product_unitprice": unitPrice,
-                            //             "product_discount": "",
-                            //             "product_image": "",
-                            //             "product_used_tax": [{
-                            //                 "tax_name": estimate_form[
-                            //                     "producttaxname[]"][i] || "TAX",
-                            //                 "tax_amount": taxTotal,
-                            //                 "tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01",
-                            //                 "tax_rate":  Number([estimate_form["producttaxrate[]"]].flat()[i]),
-                            //                 "tax_types": "%"
-                            //             }],
-                            //             "product_amount":(total + taxTotal).toString(),
-                            //             "product_with_tax_amount": (total + taxTotal).toString(),
-                            //             "product_without_tax_amount": total.toString(),
-                            //             "product_inline_note": description,
-                            //             "product_tax_per_unit": null,
-                            //             "product_tax_total": taxTotal
-                            //         };
-                            //     }
-
-                            // }).filter(Boolean) : [],
-
-                           
                             "product_data": (
                                 estimate_form["product_name[]"]
                             )
-                            ? (Array.isArray(estimate_form["product_name[]"])
-                                ? estimate_form["product_name[]"]
-                                : [estimate_form["product_name[]"]]
-                            ).map((name, i) => {
+                                ? (Array.isArray(estimate_form["product_name[]"])
+                                    ? estimate_form["product_name[]"]
+                                    : [estimate_form["product_name[]"]]
+                                ).map((name, i) => {
 
-                                if (name !== '') {
+                                    if (name !== '') {
 
-                                    // ✅ FIXED ALL ARRAY FIELDS
-                                    const quantityArr = Array.isArray(estimate_form["quantity[]"])
-                                        ? estimate_form["quantity[]"]
-                                        : [estimate_form["quantity[]"]];
+                                        // ✅ FIXED ALL ARRAY FIELDS
+                                        const quantityArr = Array.isArray(estimate_form["quantity[]"])
+                                            ? estimate_form["quantity[]"]
+                                            : [estimate_form["quantity[]"]];
 
-                                    const totalArr = Array.isArray(estimate_form["product_total[]"])
-                                        ? estimate_form["product_total[]"]
-                                        : [estimate_form["product_total[]"]];
+                                        const totalArr = Array.isArray(estimate_form["product_total[]"])
+                                            ? estimate_form["product_total[]"]
+                                            : [estimate_form["product_total[]"]];
 
-                                    const taxRateArr = Array.isArray(estimate_form["producttaxrate[]"])
-                                        ? estimate_form["producttaxrate[]"]
-                                        : [estimate_form["producttaxrate[]"]];
+                                        const taxRateArr = Array.isArray(estimate_form["producttaxrate[]"])
+                                            ? estimate_form["producttaxrate[]"]
+                                            : [estimate_form["producttaxrate[]"]];
 
-                                    const productIdArr = Array.isArray(estimate_form["product_id[]"])
-                                        ? estimate_form["product_id[]"]
-                                        : [estimate_form["product_id[]"]];
+                                        const productIdArr = Array.isArray(estimate_form["product_id[]"])
+                                            ? estimate_form["product_id[]"]
+                                            : [estimate_form["product_id[]"]];
 
-                                    const descArr = Array.isArray(estimate_form["product_description[]"])
-                                        ? estimate_form["product_description[]"]
-                                        : [estimate_form["product_description[]"]];
+                                        const descArr = Array.isArray(estimate_form["product_description[]"])
+                                            ? estimate_form["product_description[]"]
+                                            : [estimate_form["product_description[]"]];
 
-                                    const taxNameArr = Array.isArray(estimate_form["producttaxname[]"])
-                                        ? estimate_form["producttaxname[]"]
-                                        : [estimate_form["producttaxname[]"]];
+                                        const taxNameArr = Array.isArray(estimate_form["producttaxname[]"])
+                                            ? estimate_form["producttaxname[]"]
+                                            : [estimate_form["producttaxname[]"]];
 
-                                    const qty = Number(quantityArr[i] || 0);
+                                        const qty = Number(quantityArr[i] || 0);
 
-                                    const total = Number(totalArr[i] || 0);
+                                        const total = Number(totalArr[i] || 0);
 
-                                    const taxRate = Number(taxRateArr[i] || 0);
+                                        const taxRate = Number(taxRateArr[i] || 0);
 
-                                    const taxTotal = (total * taxRate) / 100;
+                                        const taxTotal = (total * taxRate) / 100;
 
-                                    const itemCode = productIdArr[i] || "";
+                                        const itemCode = productIdArr[i] || "";
 
-                                    const description = descArr[i] || "";
+                                        const description = descArr[i] || "";
 
-                                    const unitPrice = qty > 0
-                                        ? (total / qty).toFixed(2)
-                                        : "0.00";
+                                        const unitPrice = qty > 0
+                                            ? (total / qty).toFixed(2)
+                                            : "0.00";
 
-                                    return {
-                                        "product_name": name,
-                                        "product_item_code": itemCode,
-                                        "hsn_value": "",
-                                        "serial_no_value": "",
-                                        "product_quantity": qty.toString(),
-                                        "product_unit": "",
-                                        "product_unitprice": unitPrice,
-                                        "product_discount": "",
-                                        "product_image": "",
+                                        return {
+                                            "product_name": name,
+                                            "product_item_code": itemCode,
+                                            "hsn_value": "",
+                                            "serial_no_value": "",
+                                            "product_quantity": qty.toString(),
+                                            "product_unit": "",
+                                            "product_unitprice": unitPrice,
+                                            "product_discount": "",
+                                            "product_image": "",
 
-                                        "product_used_tax": [{
-                                            "tax_name": taxNameArr[i] || "TAX",
-                                            "tax_amount": taxTotal,
-                                            "tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01",
-                                            "tax_rate": taxRate,
-                                            "tax_types": "%"
-                                        }],
+                                            "product_used_tax": [{
+                                                "tax_name": taxNameArr[i] || "TAX",
+                                                "tax_amount": taxTotal,
+                                                "tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01",
+                                                "tax_rate": taxRate,
+                                                "tax_types": "%"
+                                            }],
 
-                                        "product_amount": (total + taxTotal).toString(),
-                                        "product_with_tax_amount": (total + taxTotal).toString(),
-                                        "product_without_tax_amount": total.toString(),
-                                        "product_inline_note": description,
-                                        "product_tax_per_unit": null,
-                                        "product_tax_total": taxTotal
-                                    };
-                                }
+                                            "product_amount": (total + taxTotal).toString(),
+                                            "product_with_tax_amount": (total + taxTotal).toString(),
+                                            "product_without_tax_amount": total.toString(),
+                                            "product_inline_note": description,
+                                            "product_tax_per_unit": null,
+                                            "product_tax_total": taxTotal
+                                        };
+                                    }
 
-                            }).filter(Boolean)
-                            : [],
+                                }).filter(Boolean)
+                                : [],
                             "product_unitprice_label": "Unit Price",
                             "product_discount_label": "Discount",
                             "variant_size_header": "Variant Size",
@@ -1658,95 +1606,7 @@ $(document).ready(function (e) {
                             },
                             "sub_total_label": "Sub Total",
                             "total_inlinediscount_label": "Inline Discount",
-                            // tax detail for dynamic tax..
                             
-
-                    //     "tax_detail": [
-                    //     // Product tax objects
-                    //     ...(Array.isArray(estimate_form["producttaxname[]"])
-                    //         ? estimate_form["producttaxname[]"]
-                    //         : [estimate_form["producttaxname[]"]]
-                    //     )
-                    //     .filter(name => name && String(name).trim() !== "") // ✅ REMOVE EMPTY VALUES
-                    //     .map((name, i) => {
-
-                    //         const productTaxRateArr = Array.isArray(estimate_form["producttaxrate[]"])
-                    //             ? estimate_form["producttaxrate[]"]
-                    //             : [estimate_form["producttaxrate[]"]];
-
-                    //         const rateArr = Array.isArray(estimate_form["rate[]"])
-                    //             ? estimate_form["rate[]"]
-                    //             : [estimate_form["rate[]"]];
-
-                    //         const quantityArr = Array.isArray(estimate_form["quantity[]"])
-                    //             ? estimate_form["quantity[]"]
-                    //             : [estimate_form["quantity[]"]];
-
-                    //         const rawRate = productTaxRateArr[i] || "0%";
-
-                    //         const ratePercentage = parseFloat(rawRate);
-
-                    //         const unitprice =
-                    //             (Number(rateArr[i] || 0) *
-                    //             Number(quantityArr[i] || 1));
-
-                    //         const taxValue = (unitprice * ratePercentage) / 100;
-
-                    //         window.totaltaxamount += taxValue;
-
-                    //         return {
-                    //             "tax_id": '',
-                    //             "tax_name": name,
-                    //             "tax_data": `${ratePercentage}%`,
-                    //             "tax_value": String(taxValue),
-                    //             "tax_on_header": "on",
-                    //             "tax_on_value": String(unitprice)
-                    //         };
-                    //     }),
-
-                    //     // Task tax objects
-                    //     ...(Array.isArray(estimate_form["tasktaxname[]"])
-                    //         ? estimate_form["tasktaxname[]"]
-                    //         : [estimate_form["tasktaxname[]"]]
-                    //     )
-                    //     .filter(name => name && String(name).trim() !== "") // ✅ REMOVE EMPTY VALUES
-                    //     .map((name, i) => {
-
-                    //         const taskTaxRateArr = Array.isArray(estimate_form["tasktaxrate[]"])
-                    //             ? estimate_form["tasktaxrate[]"]
-                    //             : [estimate_form["tasktaxrate[]"]];
-
-                    //         const taskRateArr = Array.isArray(estimate_form["task_rate[]"])
-                    //             ? estimate_form["task_rate[]"]
-                    //             : [estimate_form["task_rate[]"]];
-
-                    //         const taskQtyArr = Array.isArray(estimate_form["taskquantity[]"])
-                    //             ? estimate_form["taskquantity[]"]
-                    //             : [estimate_form["taskquantity[]"]];
-
-                    //         const rawRate = taskTaxRateArr[i] || "0%";
-
-                    //         const ratePercentage = parseFloat(rawRate);
-
-                    //         const unitprice =
-                    //             (Number(taskRateArr[i] || 0) *
-                    //             Number(taskQtyArr[i] || 1));
-
-                    //         const taxValue = (unitprice * ratePercentage) / 100;
-
-                    //         window.totaltaxamount += taxValue;
-
-                    //         return {
-                    //             "tax_id": '',
-                    //             "tax_name": name,
-                    //             "tax_data": `${ratePercentage}%`,
-                    //             "tax_value": String(taxValue),
-                    //             "tax_on_header": "on",
-                    //             "tax_on_value": String(unitprice)
-                    //         };
-                    //     })
-                    // ],
-
                             "tax_detail": (() => {
 
                                 const groupedTaxes = {};
@@ -1758,64 +1618,64 @@ $(document).ready(function (e) {
                                     ? estimate_form["producttaxname[]"]
                                     : [estimate_form["producttaxname[]"]]
                                 )
-                                .forEach((name, i) => {
+                                    .forEach((name, i) => {
 
-                                    if (!name || String(name).trim() === "") return;
+                                        if (!name || String(name).trim() === "") return;
 
-                                    const productTaxRateArr = Array.isArray(estimate_form["producttaxrate[]"])
-                                        ? estimate_form["producttaxrate[]"]
-                                        : [estimate_form["producttaxrate[]"]];
+                                        const productTaxRateArr = Array.isArray(estimate_form["producttaxrate[]"])
+                                            ? estimate_form["producttaxrate[]"]
+                                            : [estimate_form["producttaxrate[]"]];
 
-                                    const rateArr = Array.isArray(estimate_form["rate[]"])
-                                        ? estimate_form["rate[]"]
-                                        : [estimate_form["rate[]"]];
+                                        const rateArr = Array.isArray(estimate_form["rate[]"])
+                                            ? estimate_form["rate[]"]
+                                            : [estimate_form["rate[]"]];
 
-                                    const quantityArr = Array.isArray(estimate_form["quantity[]"])
-                                        ? estimate_form["quantity[]"]
-                                        : [estimate_form["quantity[]"]];
+                                        const quantityArr = Array.isArray(estimate_form["quantity[]"])
+                                            ? estimate_form["quantity[]"]
+                                            : [estimate_form["quantity[]"]];
 
-                                    const rawRate = productTaxRateArr[i] || "0%";
+                                        const rawRate = productTaxRateArr[i] || "0%";
 
-                                    const ratePercentage = parseFloat(rawRate);
+                                        const ratePercentage = parseFloat(rawRate);
 
-                                    const unitprice =
-                                        (Number(rateArr[i] || 0) *
-                                        Number(quantityArr[i] || 1));
+                                        const unitprice =
+                                            (Number(rateArr[i] || 0) *
+                                                Number(quantityArr[i] || 1));
 
-                                    const taxValue = (unitprice * ratePercentage) / 100;
+                                        const taxValue = (unitprice * ratePercentage) / 100;
 
-                                    window.totaltaxamount += taxValue;
+                                        window.totaltaxamount += taxValue;
 
-                                    // ✅ UNIQUE KEY
-                                    const taxKey = `${name}_${ratePercentage}`;
+                                        // ✅ UNIQUE KEY
+                                        const taxKey = `${name}_${ratePercentage}`;
 
-                                    // ✅ IF SAME TAX EXISTS => ADD VALUES
-                                    if (groupedTaxes[taxKey]) {
+                                        // ✅ IF SAME TAX EXISTS => ADD VALUES
+                                        if (groupedTaxes[taxKey]) {
 
-                                        groupedTaxes[taxKey].tax_value =
-                                            String(
-                                                Number(groupedTaxes[taxKey].tax_value) + taxValue
-                                            );
+                                            groupedTaxes[taxKey].tax_value =
+                                                String(
+                                                    Number(groupedTaxes[taxKey].tax_value) + taxValue
+                                                );
 
-                                        groupedTaxes[taxKey].tax_on_value =
-                                            String(
-                                                Number(groupedTaxes[taxKey].tax_on_value) + unitprice
-                                            );
+                                            groupedTaxes[taxKey].tax_on_value =
+                                                String(
+                                                    Number(groupedTaxes[taxKey].tax_on_value) + unitprice
+                                                );
 
-                                    } else {
+                                        } else {
 
-                                        groupedTaxes[taxKey] = {
-                                            "tax_id": '',
-                                            "tax_name": name,
-                                            "tax_data": `${ratePercentage}%`,
-                                            "tax_value": String(taxValue),
-                                            "tax_on_header": "on",
-                                            "tax_on_value": String(unitprice)
-                                        };
+                                            groupedTaxes[taxKey] = {
+                                                "tax_id": '',
+                                                "tax_name": name,
+                                                "tax_data": `${ratePercentage}%`,
+                                                "tax_value": String(taxValue),
+                                                "tax_on_header": "on",
+                                                "tax_on_value": String(unitprice)
+                                            };
 
-                                    }
+                                        }
 
-                                });
+                                    });
 
                                 // =========================
                                 // TASK / SERVICE TAXES
@@ -1824,64 +1684,64 @@ $(document).ready(function (e) {
                                     ? estimate_form["tasktaxname[]"]
                                     : [estimate_form["tasktaxname[]"]]
                                 )
-                                .forEach((name, i) => {
+                                    .forEach((name, i) => {
 
-                                    if (!name || String(name).trim() === "") return;
+                                        if (!name || String(name).trim() === "") return;
 
-                                    const taskTaxRateArr = Array.isArray(estimate_form["tasktaxrate[]"])
-                                        ? estimate_form["tasktaxrate[]"]
-                                        : [estimate_form["tasktaxrate[]"]];
+                                        const taskTaxRateArr = Array.isArray(estimate_form["tasktaxrate[]"])
+                                            ? estimate_form["tasktaxrate[]"]
+                                            : [estimate_form["tasktaxrate[]"]];
 
-                                    const taskRateArr = Array.isArray(estimate_form["task_rate[]"])
-                                        ? estimate_form["task_rate[]"]
-                                        : [estimate_form["task_rate[]"]];
+                                        const taskRateArr = Array.isArray(estimate_form["task_rate[]"])
+                                            ? estimate_form["task_rate[]"]
+                                            : [estimate_form["task_rate[]"]];
 
-                                    const taskQtyArr = Array.isArray(estimate_form["taskquantity[]"])
-                                        ? estimate_form["taskquantity[]"]
-                                        : [estimate_form["taskquantity[]"]];
+                                        const taskQtyArr = Array.isArray(estimate_form["task_quantity[]"])
+                                            ? estimate_form["task_quantity[]"]
+                                            : [estimate_form["task_quantity[]"]];
 
-                                    const rawRate = taskTaxRateArr[i] || "0%";
+                                        const rawRate = taskTaxRateArr[i] || "0%";
 
-                                    const ratePercentage = parseFloat(rawRate);
+                                        const ratePercentage = parseFloat(rawRate);
 
-                                    const unitprice =
-                                        (Number(taskRateArr[i] || 0) *
-                                        Number(taskQtyArr[i] || 1));
+                                        const unitprice =
+                                            (Number(taskRateArr[i]) *
+                                                Number(taskQtyArr[i] || 1));
 
-                                    const taxValue = (unitprice * ratePercentage) / 100;
+                                        const taxValue = (unitprice * ratePercentage) / 100;
 
-                                    window.totaltaxamount += taxValue;
+                                        window.totaltaxamount += taxValue;
 
-                                    // ✅ UNIQUE KEY
-                                    const taxKey = `${name}_${ratePercentage}`;
+                                        // ✅ UNIQUE KEY
+                                        const taxKey = `${name}_${ratePercentage}`;
 
-                                    // ✅ IF SAME TAX EXISTS => ADD VALUES
-                                    if (groupedTaxes[taxKey]) {
+                                        // ✅ IF SAME TAX EXISTS => ADD VALUES
+                                        if (groupedTaxes[taxKey]) {
 
-                                        groupedTaxes[taxKey].tax_value =
-                                            String(
-                                                Number(groupedTaxes[taxKey].tax_value) + taxValue
-                                            );
+                                            groupedTaxes[taxKey].tax_value =
+                                                String(
+                                                    Number(groupedTaxes[taxKey].tax_value) + taxValue
+                                                );
 
-                                        groupedTaxes[taxKey].tax_on_value =
-                                            String(
-                                                Number(groupedTaxes[taxKey].tax_on_value) + unitprice
-                                            );
+                                            groupedTaxes[taxKey].tax_on_value =
+                                                String(
+                                                    Number(groupedTaxes[taxKey].tax_on_value) + unitprice
+                                                );
 
-                                    } else {
+                                        } else {
 
-                                        groupedTaxes[taxKey] = {
-                                            "tax_id": '',
-                                            "tax_name": name,
-                                            "tax_data": `${ratePercentage}%`,
-                                            "tax_value": String(taxValue),
-                                            "tax_on_header": "on",
-                                            "tax_on_value": String(unitprice)
-                                        };
+                                            groupedTaxes[taxKey] = {
+                                                "tax_id": '',
+                                                "tax_name": name,
+                                                "tax_data": `${ratePercentage}%`,
+                                                "tax_value": String(taxValue),
+                                                "tax_on_header": "on",
+                                                "tax_on_value": String(unitprice)
+                                            };
 
-                                    }
+                                        }
 
-                                });
+                                    });
 
                                 // ✅ RETURN FINAL ARRAY
                                 return Object.values(groupedTaxes);
@@ -1889,7 +1749,7 @@ $(document).ready(function (e) {
                             })(),
 
                             "discount_label": "Discount",
-                            "total_cost_value": ( Number(estimate_form["total_with_tax_and_price[]"]) + Number(window.totaltaxamount) ) || 0,
+                            "total_cost_value": estimate_form["sub_amout_due[]"],
                             "shipping_cost_label": "Shipping Cost"
                         },
                         "invoice_report_title": page_name,
@@ -2005,7 +1865,7 @@ $(document).ready(function (e) {
                         return res.json(); // Correctly returning the promise
                     })
                     .then(response => {
-                        if (isInstantSaveCancelled) return; 
+                        if (isInstantSaveCancelled) return;
                         // 2. Extract the Base64 string from the "base" key
                         // We split at the comma to remove "data:application/pdf;base64,"
                         // console.log(response);
@@ -2030,8 +1890,8 @@ $(document).ready(function (e) {
 
                             // 4. Create a local URL for the PDF
                             const pdfUrl = URL.createObjectURL(pdfBlob);
-                            
-                            if (isInstantSaveCancelled) return; 
+
+                            if (isInstantSaveCancelled) return;
                             openPreview(pdfUrl);
                             window.pdfContent = pdfUrl;
 
@@ -2442,12 +2302,12 @@ $('.same_as_billing_address').on('click', function (e) {
     }
 });
 
-$("#invoice_email").on('click', function () {
-    // $("#uniquePreviewBackdrop").first().trigger('click');
-    // openPreview("http://miwebsite.localhost.com/resources/js/Invoice.pdf");
+// $("#invoice_email").on('click', function () {
+//     // $("#uniquePreviewBackdrop").first().trigger('click');
+//     // openPreview("http://miwebsite.localhost.com/resources/js/Invoice.pdf");
 
-});
-window.onload = function () { }
+// });
+// window.onload = function () { }
 
 
 
@@ -2508,7 +2368,7 @@ window.onload = function () { }
 
 
 async function openPreview(pdfUrl) {
-    
+
     const container = document.querySelector('.pdf-scroll-container');
     if (!container) return;
 
@@ -2531,11 +2391,11 @@ async function openPreview(pdfUrl) {
 
     try {
         const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-        if (isInstantSaveCancelled) return; 
+        if (isInstantSaveCancelled) return;
 
         // Loop through all pages to show multi-page PDFs
         for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-            if (isInstantSaveCancelled) return; 
+            if (isInstantSaveCancelled) return;
             const page = await pdf.getPage(pageNum);
 
             // --- OPTIMIZED RENDERING FOR MOBILE ---
@@ -2586,7 +2446,7 @@ async function openPreview(pdfUrl) {
         console.error("Render error:", err);
         if (loader) loader.classList.add('preview-hidden');
         document.getElementById('uniquePreviewBackdrop').style.display = 'none';
-        
+
         // Enable print/download/watermark on error
         $("#download-modal-trigger, #print-modal-trigger, .remove_watermark").css({
             'pointer-events': 'auto',
@@ -2598,8 +2458,8 @@ async function openPreview(pdfUrl) {
 }
 
 function closePreview() {
-    
-    isInstantSaveCancelled = true; 
+
+    isInstantSaveCancelled = true;
 
     // Enable print/download/watermark for next time
     $("#download-modal-trigger, #print-modal-trigger, .remove_watermark").css({
