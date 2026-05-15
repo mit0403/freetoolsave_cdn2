@@ -2,7 +2,19 @@
 // generic initialization....
 //--------------------------------------------------------------
 
+window.onload = function () {
+    // Focus first field without scrolling (avoids scroll jump on reload when autofocus was used)
+    var businessNameEl = document.getElementById('business_name');
+    if (businessNameEl) {
+        businessNameEl.focus({
+            preventScroll: true
+        });
+    }
+}
+
+
 let template_design = 1;        // default standard.. 
+let isInstantSaveCancelled = false;
 
 // ID-to-Number Mapping
 const TEMPLATE_MAP = {
@@ -79,12 +91,14 @@ $(window).scroll(function () {
         btn.removeClass('show');
     }
 });
+
 btn.on('click', function (e) {
     // Prevent default behavior
     e.preventDefault();
     e.stopImmediatePropagation();
 
     // Smooth scroll to top
+    
     window.scrollTo({
         top: 0,
         behavior: 'smooth'
@@ -191,8 +205,7 @@ function updateInvTplHeight() {
 
 /* 🔒 lock scroll properly */
 function lockInvTplScroll() {
-    const scrollBarWidth =
-        window.innerWidth - document.documentElement.clientWidth;
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
 
     document.body.style.overflow = "hidden";
     document.body.style.paddingRight = scrollBarWidth + "px";
@@ -267,7 +280,7 @@ window.performDocumentAction = function (action) {
         } else {
             const link = document.createElement('a');
             link.href = pdfContent;
-            link.download = (window.downloadPageName.charAt(0).toUpperCase() + downloadPageName.slice(1) + ' ' + window.pdfname || 'Document') + '.pdf';
+            link.download = (window.downloadPageName.charAt(0).toUpperCase() + downloadPageName.slice(1) + '# ' + window.pdfname || 'Document') + '.pdf';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -297,7 +310,6 @@ openBtn.addEventListener("click", (e) => {
     }
 
     const scrollBarWidth = getScrollbarWidth();
-
 
     document.body.style.overflow = "hidden";
     document.body.style.paddingRight = scrollBarWidth + "px";
@@ -525,15 +537,7 @@ window.onclick = () => document.getElementById('countryDropdown').classList.remo
 
 
 
-window.onload = function () {
-    // Focus first field without scrolling (avoids scroll jump on reload when autofocus was used)
-    var businessNameEl = document.getElementById('business_name');
-    if (businessNameEl) {
-        businessNameEl.focus({
-            preventScroll: true
-        });
-    }
-}
+
 
 const jobGroup = document.getElementById('jobRoleGroup');
 const jobTrigger = document.getElementById('jobRoleTrigger');
@@ -656,9 +660,9 @@ $(document).ready(function (e) {
                                 default_currecy = val.symbol;
                                 selected = "selected";
                             }
-                            window.curr_symbol =  val.symbol ?? 'USD';
+                            window.curr_symbol = val.symbol ?? 'USD';
                             $("#customer_currency").append('<option value="' + val
-                                .currencylocale + '" ' + selected + ' data-symbol="' +  curr_symbol + '">' + val.currency_name + '</option>');
+                                .currencylocale + '" ' + selected + ' data-symbol="' + curr_symbol + '">' + val.currency_name + '</option>');
                             // $("#customer_currency").append("<option value='"+ val.symbol +"' "+ if(val.symbol == '$') { "selected" } +" >"+val.currency_name +"</option>");
                         }
                     });
@@ -700,7 +704,7 @@ $(document).ready(function (e) {
 
     $('body').on('change', function () {
         window.currency_symbol = $("#customer_currency").find(':selected').data('symbol');
-        $(".add_symbol").text(currency_symbol);
+        $(".add_symbol").text(window.currency_symbol);
     });
     // $('.add_symbol').text(currency_symbol);
 
@@ -787,7 +791,7 @@ $(document).ready(function (e) {
                 minlength: "Min length 3 char"
             },
             customer_invoice: {
-                required: "Invoice Number is required.",
+                required: page_name.charAt(0).toUpperCase() + page_name.slice(1) + " Number is required.",
             },
         },
         errorElement: 'label',
@@ -814,9 +818,12 @@ $(document).ready(function (e) {
 
 
 
+
     // my code-- meet
     $("#instantSaveBtn").on('click', async function (e) {
         e.preventDefault();
+        isInstantSaveCancelled = false;
+        lockInvTplScroll();
 
         const $link = $(this);
 
@@ -840,6 +847,12 @@ $(document).ready(function (e) {
                 const loader = document.getElementById('previewLoadingOverlay');
                 if (backdrop) backdrop.style.display = 'flex';
                 if (loader) loader.classList.remove('preview-hidden');
+
+                // Disable print/download/watermark while loading
+                $("#download-modal-trigger, #print-modal-trigger, .remove_watermark").css({
+                    'pointer-events': 'none',
+                    'opacity': '0.5'
+                });
 
                 $('.companylogo_er').text('');
 
@@ -943,6 +956,8 @@ $(document).ready(function (e) {
 
                 // get base64 logo
                 const base64Logo = await getImageData();
+                if (isInstantSaveCancelled) return;
+
                 if (base64Logo != {}) {
                     obj['companylogo'] = base64Logo;
                 }
@@ -952,9 +967,16 @@ $(document).ready(function (e) {
 
                 const estimate_form = JSON.parse(localStorage.getItem('estimate_form'));
 
-                $('.preview-pdf').text(estimate_form.customer_invoice);     // to change pdf title dynamically.
+                // text of modal-title.
+                if (page_name == 'purchase Order') {
+                    $('.preview-pdf').text("P.O.# " + estimate_form.customer_invoice );
+                }
+                else {
+                    $('.preview-pdf').text(page_name.charAt(0).toUpperCase() + page_name.slice(1).toLowerCase() + "# " + estimate_form.customer_invoice);     // to change pdf title dynamically.
+                }
 
                 window.pdfname = estimate_form.customer_invoice;
+                window.totaltaxamount = 0;
 
                 // console.log(estimate_form);
 
@@ -1023,7 +1045,7 @@ $(document).ready(function (e) {
                             "selectedregularfontstyle": "/pdf_fonts/arial/arial_regular.txt"
                         },
                         "T_Termsandcondition": 1,
-                        "AmountDue": 1,
+                        "AmountDue": 0,
                         "C_Phone": 1,
                         "PDF_Page_Number_alignment": 2,
                         "Sign_Date_Format": "1",
@@ -1205,14 +1227,14 @@ $(document).ready(function (e) {
                             "valid_date": estimate_form.customer_date,
                             "cancelled_date_label": "",
                             "cancelled_date": "",
-                            "generated_date": "",
+                            "generated_date": '',
                             "generated_date_label": "Generated Date",
                             "supply_type_label": "Supply Type",
                             "supply_type": "",
                             "generated_by_label": "Generated By",
                             "generated_by": estimate_form.customer_detail,
                             "invoice_po_label": "P.O. #",
-                            "invoice_number_label": "Invoice #",
+                            "invoice_number_label": page_name === 'purchase Order' ? 'P.O.#' : (page_name.charAt(0).toUpperCase() + page_name.slice(1) + " #"),
                             "invoice_outstanding_label": "Outstanding",
                             "invoice_date": estimate_form.customer_date,
                             "invoice_total_label": "Total",
@@ -1224,14 +1246,14 @@ $(document).ready(function (e) {
                                 "symbol": "₹",
                                 "code": estimate_form.customer_currency,
                                 "selectedcurrency": estimate_form.customer_currency,
-                                "ammountdue": Number(estimate_form["sub_amout_due[]"]) ?? 0
+                                "ammountdue": Number(estimate_form["sub_amout_due[]"])
                             }],
-                            "invoice_total": estimate_form["total_with_tax_and_price[]"] ?? 0,
+                            "invoice_total": estimate_form["total_with_tax_and_price[]"],
                             // date title 
-                            "invoice_date_label": page_name.charAt(0).toUpperCase() + page_name.slice(1) + " #",
-                            "invoice_po_number": "",
-                            "invoice_number": "",
-                            "invoice_duedate": estimate_form.customer_due_date ?? '',
+                            "invoice_date_label": page_name.charAt(0).toUpperCase() + page_name.slice(1) + " date",
+                            "invoice_po_number": estimate_form.billing_po,
+                            "invoice_number": estimate_form.customer_invoice,
+                            "invoice_duedate": estimate_form.customer_due_date,
                             "estimate_number_label": "Estimate #"
                         },
                         "notes": {
@@ -1263,7 +1285,7 @@ $(document).ready(function (e) {
                         "pin_code": "",
                         // curruncy
                         // "selected_currency": (estimate_form.customer_currency) ? estimate_form.customer_currency : "₹",
-                        "selected_currency": window.currency_symbol ,
+                        "selected_currency": window.currency_symbol,
                         "mobile_no": "",
 
                         // business email.
@@ -1271,51 +1293,51 @@ $(document).ready(function (e) {
 
                         // business address.
                         "billing_address": {
-                            "home_no": estimate_form.business_address,
+                            "home_no": '',
                             "billing_address_label_style": {
                                 "font_size": 9
                             },
                             "business_no": "",
-                            "billing_country": estimate_form.business_country,
-                            "billing_pin_code": "",
-                            "billing_address_label": "Estimate To:",
-                            "billing_address_customer": "Organization",
-                            "firstname": "First Name",
-                            "lastname": "Last Name",
-                            "contact_email": estimate_form.business_email,
+                            "billing_country": estimate_form.billing_country,
+                            "billing_pin_code": estimate_form.billing_po,
+                            "billing_address_label": page_name.charAt(0).toUpperCase() + page_name.slice(1) + "To:",
+                            "billing_address_customer": "",
+                            "firstname": "",
+                            "lastname": "",
+                            "contact_email": '',
                             "billing_vat_no": "",
-                            "billing_city": estimate_form.business_city,
+                            "billing_city": estimate_form.billing_city,
                             "billing_mobile_no": "",
-                            "full_name": estimate_form.business_name,
-                            "billing_state": estimate_form.business_state,
-                            "billing_street_2": "",
+                            "full_name": estimate_form.customer_detail,
+                            "billing_state": estimate_form.billing_state,
+                            "billing_street_2": estimate_form.billing_street_2,
                             "billing_reg_no": "",
-                            "billing_street_1": "",
+                            "billing_street_1": estimate_form.billing_street_1,
                             "fax_no": ""
                         },
                         // billing data.
                         "bill_from_address": {
                             "address_label": "From",
-                            "street_1": estimate_form.billing_street_1,
-                            "street_2": estimate_form.billing_street_2,
-                            "city": estimate_form.billing_city,
-                            "state": estimate_form.billing_state,
-                            "pin_code": estimate_form.billing_zip_code,
-                            "country": estimate_form.billing_country,
-                            "address_customer": estimate_form.customer_detail,
+                            "street_1": '',
+                            "street_2": '',
+                            "city": '',
+                            "state": '',
+                            "pin_code": '',
+                            "country": '',
+                            "address_customer": '',
                             "address_label_style": {
                                 "font_size": 9
                             }
                         },
                         "dispatch_address": {
                             "address_label": "Dispatch From",
-                            "street_1": estimate_form.shipping_street_1,
-                            "street_2": estimate_form.shipping_street_2,
-                            "city": estimate_form.shipping_city,
-                            "state": estimate_form.shipping_state,
-                            "pin_code": estimate_form.shipping_zip_code,
-                            "country": estimate_form.shipping_country,
-                            "address_customer": estimate_form.customer_detail,
+                            "street_1": '',
+                            "street_2": '',
+                            "city": '',
+                            "state": '',
+                            "pin_code": '',
+                            "country": '',
+                            "address_customer": '',
                             "address_label_style": {
                                 "font_size": 9
                             }
@@ -1368,7 +1390,7 @@ $(document).ready(function (e) {
                         },
                         "task_table": {
                             "task_header_tax": [{
-                                "task_header_tax_name": "GST",
+                                "task_header_tax_name": "Tax",
                                 "task_header_tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01"
                             }],
                             "task_quantity_label": "Quantity",
@@ -1382,24 +1404,29 @@ $(document).ready(function (e) {
                                         if (name !== '') {
                                             return {
                                                 task_name: name,
-                                                task_project: name,
+                                                task_project: '',
                                                 task_unit: "",
                                                 task_discount: "",
                                                 task_used_tax: [{
                                                     tax_name: "GST",
-                                                    tax_amount: Number([estimate_form["tasktaxrate[]"]].flat()[i]) || '',
+                                                    tax_amount: (Number([estimate_form["task_rate[]"]].flat()[i]) * Number([estimate_form["tasktaxrate[]"]].flat()[i])) / 100 || '',
                                                     tax_rate: Number([estimate_form["tasktaxrate[]"]].flat()[i]) || '',
                                                     tax_types: "%",
                                                     tax_id: "82A4E33B-9598-44BA-A9FF-AA6A77218C01"
                                                 }],
-                                                task_amount: Number([estimate_form["task_rate[]"]].flat()[i]) || '',
+
+                                                // task-amount =dynamic.
+                                                task_amount: (Number([estimate_form["task_rate[]"]].flat()[i]) + (Number([estimate_form["task_rate[]"]].flat()[i]) * Number([estimate_form["tasktaxrate[]"]].flat()[i])) / 100) * Number([estimate_form["task_quantity[]"]].flat()[i]) || '',
                                                 task_rate: Number([estimate_form["task_rate[]"]].flat()[i]) || '',
                                                 task_quantity: Number([estimate_form["task_quantity[]"]].flat()[i]) || '',
                                                 sac_value: "",
                                                 task_inline_note: [estimate_form["task_description[]"]].flat()[i] || "",
                                                 task_inline_date: "",
+                                                // task_tax_per_unit: Number([estimate_form["tasktaxrate[]"]].flat()[i]) || '',
                                                 task_tax_per_unit: Number([estimate_form["tasktaxrate[]"]].flat()[i]) || '',
+
                                                 task_tax_total: Number([estimate_form["tasktaxrate[]"]].flat()[i]) || ''
+                                                // task_tax_total: 60000,
                                             };
                                         }
                                     })
@@ -1447,66 +1474,87 @@ $(document).ready(function (e) {
                             "product_amount_label": "Amount",
                             "product_serial_no_label": "Serial/IMEI",
 
-                            "product_data": (estimate_form["product_name[]"]) ? [estimate_form["product_name[]"]].flat().map((name,
-                                i) => {
-                                // 1. Capture the values from parallel arrays using index [i]
-                                // We use Number() to ensure calculations work, and || 0 as a fallback
+                            "product_data": (
+                                estimate_form["product_name[]"]
+                            )
+                                ? (Array.isArray(estimate_form["product_name[]"])
+                                    ? estimate_form["product_name[]"]
+                                    : [estimate_form["product_name[]"]]
+                                ).map((name, i) => {
 
-                                if (name !== '') {
+                                    if (name !== '') {
 
+                                        // ✅ FIXED ALL ARRAY FIELDS
+                                        const quantityArr = Array.isArray(estimate_form["quantity[]"])
+                                            ? estimate_form["quantity[]"]
+                                            : [estimate_form["quantity[]"]];
 
-                                    const qty = Number([estimate_form["quantity[]"]].flat()[
-                                        i] || '');
-                                    const total = Number([estimate_form["product_total[]"]]
-                                        .flat()[i] ||
-                                        '');
-                                    const taxTotal = Number([estimate_form["producttaxrate[]"]]
-                                        .flat()[
-                                        i
-                                    ] || '');
-                                    const itemCode = [estimate_form["product_id[]"]].flat() ? [
-                                        estimate_form["product_id[]"]
-                                    ].flat()[i] : "";
-                                    const description = [estimate_form["product_description[]"]]
-                                        .flat()[
-                                        i
-                                    ] || "";
+                                        const totalArr = Array.isArray(estimate_form["product_total[]"])
+                                            ? estimate_form["product_total[]"]
+                                            : [estimate_form["product_total[]"]];
 
-                                    // 2. Calculate Unit Price (Total / Quantity)
-                                    const unitPrice = qty > 0 ? (total / qty).toFixed(2) :
-                                        "0.00";
+                                        const taxRateArr = Array.isArray(estimate_form["producttaxrate[]"])
+                                            ? estimate_form["producttaxrate[]"]
+                                            : [estimate_form["producttaxrate[]"]];
 
-                                    // 3. Return the row object
-                                    return {
-                                        "product_name": name,
-                                        "product_item_code": itemCode,
-                                        "hsn_value": "",
-                                        "serial_no_value": "",
-                                        "product_quantity": qty.toString(),
-                                        "product_unit": "",
-                                        "product_unitprice": unitPrice,
-                                        "product_discount": "",
-                                        "product_image": "",
-                                        "product_used_tax": [{
-                                            "tax_name": estimate_form[
-                                                "producttaxname[]"][i] || "GST",
-                                            "tax_amount": taxTotal,
-                                            "tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01",
-                                            "tax_rate": taxTotal.toString(),
-                                            "tax_types": "%"
-                                        }],
-                                        "product_amount": total.toString(),
-                                        "product_with_tax_amount": (total + taxTotal)
-                                            .toString(),
-                                        "product_without_tax_amount": total.toString(),
-                                        "product_inline_note": description,
-                                        "product_tax_per_unit": null,
-                                        "product_tax_total": taxTotal
-                                    };
-                                }
+                                        const productIdArr = Array.isArray(estimate_form["product_id[]"])
+                                            ? estimate_form["product_id[]"]
+                                            : [estimate_form["product_id[]"]];
 
-                            }).filter(Boolean) : [],
+                                        const descArr = Array.isArray(estimate_form["product_description[]"])
+                                            ? estimate_form["product_description[]"]
+                                            : [estimate_form["product_description[]"]];
 
+                                        const taxNameArr = Array.isArray(estimate_form["producttaxname[]"])
+                                            ? estimate_form["producttaxname[]"]
+                                            : [estimate_form["producttaxname[]"]];
+
+                                        const qty = Number(quantityArr[i] || 0);
+
+                                        const total = Number(totalArr[i] || 0);
+
+                                        const taxRate = Number(taxRateArr[i] || 0);
+
+                                        const taxTotal = (total * taxRate) / 100;
+
+                                        const itemCode = productIdArr[i] || "";
+
+                                        const description = descArr[i] || "";
+
+                                        const unitPrice = qty > 0
+                                            ? (total / qty).toFixed(2)
+                                            : "0.00";
+
+                                        return {
+                                            "product_name": name,
+                                            "product_item_code": itemCode,
+                                            "hsn_value": "",
+                                            "serial_no_value": "",
+                                            "product_quantity": qty.toString(),
+                                            "product_unit": "",
+                                            "product_unitprice": unitPrice,
+                                            "product_discount": "",
+                                            "product_image": "",
+
+                                            "product_used_tax": [{
+                                                "tax_name": taxNameArr[i] || "TAX",
+                                                "tax_amount": taxTotal,
+                                                "tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01",
+                                                "tax_rate": taxRate,
+                                                "tax_types": "%"
+                                            }],
+
+                                            "product_amount": (total + taxTotal).toString(),
+                                            "product_with_tax_amount": (total + taxTotal).toString(),
+                                            "product_without_tax_amount": total.toString(),
+                                            "product_inline_note": description,
+                                            "product_tax_per_unit": null,
+                                            "product_tax_total": taxTotal
+                                        };
+                                    }
+
+                                }).filter(Boolean)
+                                : [],
                             "product_unitprice_label": "Unit Price",
                             "product_discount_label": "Discount",
                             "variant_size_header": "Variant Size",
@@ -1515,7 +1563,7 @@ $(document).ready(function (e) {
                                 "font_size": 10
                             },
                             "product_header_tax": [{
-                                "product_header_tax_name": "GST",
+                                "product_header_tax_name": "Tax",
                                 "product_header_tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01"
                             }]
 
@@ -1530,7 +1578,7 @@ $(document).ready(function (e) {
                         "table_cal": {
                             "qty_label": "Qty",
                             "deposit_label": "Deposit",
-                            "amountpaid_value": 0,
+                            "amountpaid_value": '',
                             "task_quantity_label": "Quantity",
                             "total_cost_label": "Total",
                             "amountdue_label": "Amount Due",
@@ -1544,7 +1592,7 @@ $(document).ready(function (e) {
                             "sub_total_value": `${estimate_form["sub_total[]"] ?? 0}`,
                             "deposit_ratio": "20",
                             "discount_ratio": "10.0000%",
-                            "amountdue_value": `${estimate_form["sub_amout_due[]"] ?? 0}`,
+                            "amountdue_value": '',
                             "discount_on_value": `${estimate_form["total_with_tax_and_price[]"] ?? 0}`,
                             "discount_on_header": "on",
                             "depositdue_value": 0,
@@ -1552,23 +1600,156 @@ $(document).ready(function (e) {
                             "amountpaid_label": "Amount Paid",
                             "single_total_label": "Total Quantity",
                             "return_order_label": "Return Order",
-                            "return_order_value": 1500,
+                            "return_order_value": '',
                             "table_cal_style": {
                                 "font_size": 9
                             },
                             "sub_total_label": "Sub Total",
                             "total_inlinediscount_label": "Inline Discount",
-                            // tax detail for dynamic tax..
-                            "tax_detail": [{
-                                "tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01",
-                                "tax_name": "GST",
-                                "tax_data": "5%",
-                                "tax_value": `${(estimate_form["sub_total[]"] * 5) / 100 ?? 0}`,
-                                "tax_on_header": "on",
-                                "tax_on_value": `${estimate_form["sub_total[]"] ?? 0}`,
-                            }],
+                            
+                            "tax_detail": (() => {
+
+                                const groupedTaxes = {};
+
+                                // =========================
+                                // PRODUCT TAXES
+                                // =========================
+                                (Array.isArray(estimate_form["producttaxname[]"])
+                                    ? estimate_form["producttaxname[]"]
+                                    : [estimate_form["producttaxname[]"]]
+                                )
+                                    .forEach((name, i) => {
+
+                                        if (!name || String(name).trim() === "") return;
+
+                                        const productTaxRateArr = Array.isArray(estimate_form["producttaxrate[]"])
+                                            ? estimate_form["producttaxrate[]"]
+                                            : [estimate_form["producttaxrate[]"]];
+
+                                        const rateArr = Array.isArray(estimate_form["rate[]"])
+                                            ? estimate_form["rate[]"]
+                                            : [estimate_form["rate[]"]];
+
+                                        const quantityArr = Array.isArray(estimate_form["quantity[]"])
+                                            ? estimate_form["quantity[]"]
+                                            : [estimate_form["quantity[]"]];
+
+                                        const rawRate = productTaxRateArr[i] || "0%";
+
+                                        const ratePercentage = parseFloat(rawRate);
+
+                                        const unitprice =
+                                            (Number(rateArr[i] || 0) *
+                                                Number(quantityArr[i] || 1));
+
+                                        const taxValue = (unitprice * ratePercentage) / 100;
+
+                                        window.totaltaxamount += taxValue;
+
+                                        // ✅ UNIQUE KEY
+                                        const taxKey = `${name}_${ratePercentage}`;
+
+                                        // ✅ IF SAME TAX EXISTS => ADD VALUES
+                                        if (groupedTaxes[taxKey]) {
+
+                                            groupedTaxes[taxKey].tax_value =
+                                                String(
+                                                    Number(groupedTaxes[taxKey].tax_value) + taxValue
+                                                );
+
+                                            groupedTaxes[taxKey].tax_on_value =
+                                                String(
+                                                    Number(groupedTaxes[taxKey].tax_on_value) + unitprice
+                                                );
+
+                                        } else {
+
+                                            groupedTaxes[taxKey] = {
+                                                "tax_id": '',
+                                                "tax_name": name,
+                                                "tax_data": `${ratePercentage}%`,
+                                                "tax_value": String(taxValue),
+                                                "tax_on_header": "on",
+                                                "tax_on_value": String(unitprice)
+                                            };
+
+                                        }
+
+                                    });
+
+                                // =========================
+                                // TASK / SERVICE TAXES
+                                // =========================
+                                (Array.isArray(estimate_form["tasktaxname[]"])
+                                    ? estimate_form["tasktaxname[]"]
+                                    : [estimate_form["tasktaxname[]"]]
+                                )
+                                    .forEach((name, i) => {
+
+                                        if (!name || String(name).trim() === "") return;
+
+                                        const taskTaxRateArr = Array.isArray(estimate_form["tasktaxrate[]"])
+                                            ? estimate_form["tasktaxrate[]"]
+                                            : [estimate_form["tasktaxrate[]"]];
+
+                                        const taskRateArr = Array.isArray(estimate_form["task_rate[]"])
+                                            ? estimate_form["task_rate[]"]
+                                            : [estimate_form["task_rate[]"]];
+
+                                        const taskQtyArr = Array.isArray(estimate_form["task_quantity[]"])
+                                            ? estimate_form["task_quantity[]"]
+                                            : [estimate_form["task_quantity[]"]];
+
+                                        const rawRate = taskTaxRateArr[i] || "0%";
+
+                                        const ratePercentage = parseFloat(rawRate);
+
+                                        const unitprice =
+                                            (Number(taskRateArr[i]) *
+                                                Number(taskQtyArr[i] || 1));
+
+                                        const taxValue = (unitprice * ratePercentage) / 100;
+
+                                        window.totaltaxamount += taxValue;
+
+                                        // ✅ UNIQUE KEY
+                                        const taxKey = `${name}_${ratePercentage}`;
+
+                                        // ✅ IF SAME TAX EXISTS => ADD VALUES
+                                        if (groupedTaxes[taxKey]) {
+
+                                            groupedTaxes[taxKey].tax_value =
+                                                String(
+                                                    Number(groupedTaxes[taxKey].tax_value) + taxValue
+                                                );
+
+                                            groupedTaxes[taxKey].tax_on_value =
+                                                String(
+                                                    Number(groupedTaxes[taxKey].tax_on_value) + unitprice
+                                                );
+
+                                        } else {
+
+                                            groupedTaxes[taxKey] = {
+                                                "tax_id": '',
+                                                "tax_name": name,
+                                                "tax_data": `${ratePercentage}%`,
+                                                "tax_value": String(taxValue),
+                                                "tax_on_header": "on",
+                                                "tax_on_value": String(unitprice)
+                                            };
+
+                                        }
+
+                                    });
+
+                                // ✅ RETURN FINAL ARRAY
+                                return Object.values(groupedTaxes);
+
+                            })(),
+
                             "discount_label": "Discount",
-                            "total_cost_value": `${estimate_form["total_with_tax_and_price[]"] ?? 0}`,
+                            "total_cost_value": estimate_form["sub_amout_due[]"],
                             "shipping_cost_label": "Shipping Cost"
                         },
                         "invoice_report_title": page_name,
@@ -1586,7 +1767,7 @@ $(document).ready(function (e) {
                         "background_image_height": 0,
                         "background_image": "https://www.mooninvoice.com/public/pdf_template/default.png",
                         "maxdecimaldigit": 2,
-                        "street_1": "",
+                        "street_1": estimate_form.business_address,
                         "street_2": "",
                         "Signature": {
                             "Signature_2_image": "",
@@ -1679,10 +1860,12 @@ $(document).ready(function (e) {
                     // error comes here,... 
                     // .then(res => res.json()) // 1. Read the response as JSON text
                     .then(res => {
+                        if (isInstantSaveCancelled) throw new Error("cancelled");
                         if (!res.ok) throw new Error("Network response was not ok");
                         return res.json(); // Correctly returning the promise
                     })
                     .then(response => {
+                        if (isInstantSaveCancelled) return;
                         // 2. Extract the Base64 string from the "base" key
                         // We split at the comma to remove "data:application/pdf;base64,"
                         // console.log(response);
@@ -1707,6 +1890,8 @@ $(document).ready(function (e) {
 
                             // 4. Create a local URL for the PDF
                             const pdfUrl = URL.createObjectURL(pdfBlob);
+
+                            if (isInstantSaveCancelled) return;
                             openPreview(pdfUrl);
                             window.pdfContent = pdfUrl;
 
@@ -1719,6 +1904,7 @@ $(document).ready(function (e) {
 
                     })
                     .catch(err => {
+                        if (err.message === "cancelled") return;
                         console.error("Failed to process PDF:", err);
                         alert("Could not generate PDF. Check console for details.");
                     });
@@ -1730,6 +1916,7 @@ $(document).ready(function (e) {
                     'pointer-events': 'auto',
                     'opacity': '1'
                 });
+                unlockInvTplScroll();
             }
         }
         catch (error) {
@@ -1738,6 +1925,7 @@ $(document).ready(function (e) {
                 'pointer-events': 'auto',
                 'opacity': '1'
             });
+            unlockInvTplScroll();
         }
 
 
@@ -2114,12 +2302,12 @@ $('.same_as_billing_address').on('click', function (e) {
     }
 });
 
-$("#invoice_email").on('click', function () {
-    // $("#uniquePreviewBackdrop").first().trigger('click');
-    // openPreview("http://miwebsite.localhost.com/resources/js/Invoice.pdf");
+// $("#invoice_email").on('click', function () {
+//     // $("#uniquePreviewBackdrop").first().trigger('click');
+//     // openPreview("http://miwebsite.localhost.com/resources/js/Invoice.pdf");
 
-});
-window.onload = function () { }
+// });
+// window.onload = function () { }
 
 
 
@@ -2176,61 +2364,124 @@ window.onload = function () { }
     }
 */
 
-async function openPreview(pdfUrl) {
-    const canvas = document.getElementById('pdfCanvas');
-    const container = document.querySelector('.pdf-scroll-container');
-    const context = canvas.getContext('2d', { alpha: false }); // alpha: false improves performance
 
-    // Show backdrop/loader logic here...
+
+
+async function openPreview(pdfUrl) {
+
+    const container = document.querySelector('.pdf-scroll-container');
+    if (!container) return;
+
+    // Clear existing preview
+    container.innerHTML = '';
+
+    // Show backdrop/loader
     document.getElementById('uniquePreviewBackdrop').style.display = 'flex';
+    const loader = document.getElementById('previewLoadingOverlay');
+    if (loader) loader.classList.remove('preview-hidden');
 
     const pdfjsLib = window['pdfjsLib'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+    // Disable print/download/watermark while loading (redundant but safe)
+    $("#download-modal-trigger, #print-modal-trigger, .remove_watermark").css({
+        'pointer-events': 'none',
+        'opacity': '0.5'
+    });
+
     try {
         const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-        const page = await pdf.getPage(1);
+        if (isInstantSaveCancelled) return;
 
-        // --- THE "SECRET SAUCE" FOR CLARITY ---
-        const dpr = window.devicePixelRatio || 1;
-        const originalViewport = page.getViewport({ scale: 1 });
-        const scale = container.clientWidth / originalViewport.width;
-        const viewport = page.getViewport({ scale: scale * dpr });
+        // Loop through all pages to show multi-page PDFs
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            if (isInstantSaveCancelled) return;
+            const page = await pdf.getPage(pageNum);
 
-        // Set the actual resolution (High-Res)
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
+            // --- OPTIMIZED RENDERING FOR MOBILE ---
+            // Limit DPR to 2.0 to prevent memory crashes on high-res mobile devices
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const originalViewport = page.getViewport({ scale: 1 });
 
-        // Set the display size (Matches Screen)
-        canvas.style.width = container.clientWidth + "px";
-        canvas.style.height = "auto";
+            // Calculate scale based on container width
+            const containerWidth = container.clientWidth - 40; // Subtract padding/margin
+            const scale = containerWidth / originalViewport.width;
+            const viewport = page.getViewport({ scale: scale * dpr });
 
-        await page.render({
-            canvasContext: context,
-            viewport: viewport,
-            intent: 'display'
-        }).promise;
+            // Create and setup canvas for each page
+            const canvas = document.createElement('canvas');
+            canvas.className = 'pdf-page-canvas';
+            canvas.style.display = 'block';
+            canvas.style.margin = '10px auto';
+            canvas.style.boxShadow = '0 4px 15px rgba(0,0,0,0.15)';
 
-        document.getElementById('previewLoadingOverlay').classList.add('preview-hidden');
+            const context = canvas.getContext('2d', { alpha: false });
+
+            // Set actual resolution (High-Res but clamped)
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            // Set display size (Matches Screen)
+            canvas.style.width = containerWidth + "px";
+            canvas.style.height = "auto";
+
+            container.appendChild(canvas);
+
+            await page.render({
+                canvasContext: context,
+                viewport: viewport,
+                intent: 'display'
+            }).promise;
+        }
+
+        if (loader) loader.classList.add('preview-hidden');
+
+        // Enable print/download/watermark after loading completely
+        $("#download-modal-trigger, #print-modal-trigger, .remove_watermark").css({
+            'pointer-events': 'auto',
+            'opacity': '1'
+        });
+
     } catch (err) {
         console.error("Render error:", err);
-        document.getElementById('previewLoadingOverlay').classList.add('preview-hidden');
+        if (loader) loader.classList.add('preview-hidden');
         document.getElementById('uniquePreviewBackdrop').style.display = 'none';
+
+        // Enable print/download/watermark on error
+        $("#download-modal-trigger, #print-modal-trigger, .remove_watermark").css({
+            'pointer-events': 'auto',
+            'opacity': '1'
+        });
+
         alert("Could not load PDF. Please try again.");
     }
 }
 
-
-
 function closePreview() {
+
+    isInstantSaveCancelled = true;
+
+    // Enable print/download/watermark for next time
+    $("#download-modal-trigger, #print-modal-trigger, .remove_watermark").css({
+        'pointer-events': 'auto',
+        'opacity': '1'
+    });
+
+
     const backdrop = document.getElementById('uniquePreviewBackdrop');
     if (backdrop) backdrop.style.display = 'none';
 
-    // ✅ Reset loader for next time
+    unlockInvTplScroll();
+
+    // Reset loader for next time
     const loader = document.getElementById('previewLoadingOverlay');
     if (loader) loader.classList.remove('preview-hidden');
 
-    // code to enable the save link.
+    // Clear canvases to free memory immediately
+    const container = document.querySelector('.pdf-scroll-container');
+    if (container) container.innerHTML = '';
+
+    // Enable the save button if it was in loading state
     if ($("#instantSaveBtn").hasClass('is-loading')) {
         $("#instantSaveBtn").removeClass('is-loading').css({
             'pointer-events': 'auto',
@@ -2239,104 +2490,59 @@ function closePreview() {
     }
 }
 
-
 function printPDF() {
-    const canvas = document.getElementById('pdfCanvas');
-    if (!canvas) {
-        console.error("Canvas not found");
+    const container = document.querySelector('.pdf-scroll-container');
+    const canvases = container ? container.querySelectorAll('canvas') : [];
+
+    if (canvases.length === 0) {
+        console.error("No pages found to print");
         return;
     }
 
-    // 1. Convert canvas to Image
-    const dataUrl = canvas.toDataURL('image/png', 1.0);
-
-    // 2. Create a hidden iframe
+    // Create a hidden iframe for printing
     let printFrame = document.getElementById('print-helper-frame');
-    // if (!printFrame) {
-    //     printFrame = document.createElement('iframe');
-    //     printFrame.id = 'print-helper-frame';
-    //     printFrame.style.display = 'none'; // Keep it hidden
-    //     document.body.appendChild(printFrame);
-    // }
     if (printFrame) {
         printFrame.remove();
     }
 
     printFrame = document.createElement('iframe');
     printFrame.id = 'print-helper-frame';
-
-    // Inline styling to ensure the iframe itself doesn't trigger layout shifts
-    Object.assign(printFrame.style, {
-        position: 'fixed',
-        right: '0',
-        bottom: '0',
-        width: '0',
-        height: '0',
-        border: '0',
-        zIndex: '-1'
-    });
-
+    printFrame.style.position = 'fixed';
+    printFrame.style.right = '0';
+    printFrame.style.bottom = '0';
+    printFrame.style.width = '0';
+    printFrame.style.height = '0';
+    printFrame.style.border = '0';
     document.body.appendChild(printFrame);
 
-
-    // 3. Write content to the iframe
     const doc = printFrame.contentWindow.document;
     doc.open();
-    // doc.write(`<html>
-    //                 <body style="margin:0;">
-    //                     <img src="${dataUrl}" style="width:100%;" onload="window.print();">
-    //                 </body>
-    //             </html>`);
+    doc.write('<html><head><title>Print PDF</title>');
+    // Style for multi-page print layout
+    doc.write('<style>body{margin:0;padding:0;} img{display:block;width:100%;page-break-after:always;} img:last-child{page-break-after:avoid;}</style>');
+    doc.write('</head><body>');
 
-    doc.write(`
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <style>
-                    /* Critical: Remove all browser default margins */
-                    @page { 
-                        margin: 0.01; 
-                        size: auto; 
-                    }
-                    html, body { 
-                        margin: 0; 
-                        padding: 0; 
-                        width: 99%;
-                    }
-                    img { 
-                        display: block;
-                        width: 100%;
-                        height: auto;
-                        /* Prevent Safari from splitting image across pages */
-                        page-break-inside: avoid;
-                        -webkit-column-break-inside: avoid;
-                        break-inside: avoid;
-                    }
-                </style>
-            </head>
-            <body>
-                <img src="${dataUrl}" id="print-img">
-                <script>
-                    const img = document.getElementById('print-img');
-                    img.onload = function() {
-                        // Small timeout helps Safari's PDFKit/Print engine stabilize
-                        setTimeout(() => {
-                            window.focus();
-                            window.print();
-                        }, 250);
-                    };
-                <\/script>
-            </body>
-        </html>
-    `);
+    canvases.forEach((canvas) => {
+        const dataUrl = canvas.toDataURL('image/png', 1.0);
+        doc.write(`<img src="${dataUrl}" />`);
+    });
+
+    doc.write('</body></html>');
     doc.close();
-    
 
-    // 4. Optional: Remove the iframe after printing
-    printFrame.contentWindow.onafterprint = () => {
-        document.body.removeChild(printFrame);
-    };
+    // Trigger print
+    printFrame.contentWindow.focus();
+    setTimeout(() => {
+        printFrame.contentWindow.print();
+        // Remove frame after a delay to allow print dialog to initialize
+        setTimeout(() => {
+            if (printFrame.parentNode) {
+                printFrame.parentNode.removeChild(printFrame);
+            }
+        }, 1000);
+    }, 500);
 }
+
 
 
 
