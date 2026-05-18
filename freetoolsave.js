@@ -1474,7 +1474,6 @@ $(document).ready(function (e) {
                             "product_amount_label": "Amount",
                             "product_serial_no_label": "Serial/IMEI",
 
-                         
                             "product_data": (
                                 estimate_form["product_name[]"]
                             )
@@ -1607,7 +1606,7 @@ $(document).ready(function (e) {
                             },
                             "sub_total_label": "Sub Total",
                             "total_inlinediscount_label": "Inline Discount",
-                           
+                            
                             "tax_detail": (() => {
 
                                 const groupedTaxes = {};
