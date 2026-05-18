@@ -1002,11 +1002,13 @@ $(document).ready(function (e) {
                         "cancallation_details": 1,
                         "vehicle_detail": 1,
                         // change number for diffrent tamplete.
-                        "template_number": template_design,             // 2== letter head, 
+                        "template_number": (template_design == 3 ? 2 : template_design),             // 2== letter head, 
                         "selected_language": "en",
                         "hsn_sac_table": 0,
                         "qr_code": 1,
-                        "logo": 1,
+                        // "logo": 1,
+                        "logo": (template_design == 3 ? 0 : 1),
+
                         "Scalling": "2",
                         "Horizontal": "2",
                         "Vertical": "2",
@@ -1014,11 +1016,15 @@ $(document).ready(function (e) {
                         "banks_details_pdf": 1,
                         "t_banks_details_pdf": "1",
                         "AmountPaid": 1,
-                        "C_Name_PDF": 1,
+                        // "C_Name_PDF": 1,
+                        "C_Name_PDF": (template_design == 3 ? 0 : 1),
+
                         "Accepted_Pay_Method_Position": 1,
                         // toggle for rem water mark...
                         "invoice_hyperlink": 1,
-                        "C_Address": 1,
+                        // "C_Address": 1,
+                        "C_Address": (template_design == 3 ? 0 : 1),
+
                         "H_Lines": 1,
                         "shipping_method": 1,
                         "Vat_no_Cust": 1,
@@ -1028,6 +1034,8 @@ $(document).ready(function (e) {
                         "product_table_image_show": 0,
                         "PDF_Page_Number": 0,
                         "Reg_No": 0,
+                        
+
                         "Terms_Notes_Full_Width": 0,
                         "hide_payment_number": 1,
                         "comman_layout": {
@@ -1046,7 +1054,8 @@ $(document).ready(function (e) {
                         },
                         "T_Termsandcondition": 1,
                         "AmountDue": 0,
-                        "C_Phone": 1,
+                        // "C_Phone": 1,
+                        C_Phone:(template_design == 3 ? 0 : 1),
                         "PDF_Page_Number_alignment": 2,
                         "Sign_Date_Format": "1",
                         "Sum_inline_Discount": 1,
@@ -1056,7 +1065,9 @@ $(document).ready(function (e) {
                         "task_amount": 1,
                         "Signature_1": 1,
                         "product_name": "1",
-                        "C_Mobile": 1,
+                        // "C_Mobile": 1,
+                        "C_Mobile": (template_design == 3 ? 0 : 1),
+
                         "C_Country": 1,
                         "Reg_No_Alignment_Cust": 1,
                         "Date_format": 1,
@@ -1079,7 +1090,9 @@ $(document).ready(function (e) {
                         "Cust_Home": 1,
                         "Cust_Fax": 1,
                         "ContactFirstLastName": 1,
-                        "Company_URL": 1,
+                        // "Company_URL": 1,
+                        "Company_URL": (template_design == 3 ? 0 : 1),
+
                         "tax_summary": 1,
                         "Email_Cont_Alignment": 0,
                         "product_quantity": 1,
@@ -1090,7 +1103,9 @@ $(document).ready(function (e) {
                         "taxable_amount": 1,
                         "sub_title_alignment": 1,
                         "Accepted_Pay_Method_Show": 1,
-                        "C_Email": 1,
+                        // "C_Email": 1,
+                        "C_Email": (template_design == 3 ? 0 : 1),
+
                         "Notes": 1,
                         "Cust_Mobile": 1,
                         "product_amount": 1,
@@ -1114,7 +1129,9 @@ $(document).ready(function (e) {
                         "Total": 1,
                         "Reg_No_Cust": 1,
                         "Po_no": 1,
-                        "Vat_no": 1,
+                        // "Vat_no": 1,
+                        "Vat_no": (template_design == 3 ? 0 : 1),
+
                         "template_background": 0,
                         "F_Color": "1",
                         "tax_summary_data": 1,
@@ -1127,7 +1144,9 @@ $(document).ready(function (e) {
                         "Show_Currency_Symbol": 1,
                         "Show_Currency_Code": 0,
                         "Payment_Note": 0,
-                        "C_Fax": 1,
+                        // "C_Fax": 1,
+                        "C_Fax": (template_design == 3 ? 0 : 1),
+
                         "show_sac": 1,
                         "show_hsn": 1,
                         "einvoice_ack_date_show": 1,
@@ -1409,7 +1428,7 @@ $(document).ready(function (e) {
                                                 task_discount: "",
                                                 task_used_tax: [{
                                                     tax_name: "GST",
-                                                    tax_amount: (Number([estimate_form["task_rate[]"]].flat()[i]) * Number([estimate_form["tasktaxrate[]"]].flat()[i])) / 100 || '',
+                                                    tax_amount: ( (Number([estimate_form["task_rate[]"]].flat()[i]) * Number([estimate_form["task_quantity[]"]].flat()[i]) ) * Number([estimate_form["tasktaxrate[]"]].flat()[i])) / 100 || '',
                                                     tax_rate: Number([estimate_form["tasktaxrate[]"]].flat()[i]) || '',
                                                     tax_types: "%",
                                                     tax_id: "82A4E33B-9598-44BA-A9FF-AA6A77218C01"
@@ -1474,6 +1493,62 @@ $(document).ready(function (e) {
                             "product_amount_label": "Amount",
                             "product_serial_no_label": "Serial/IMEI",
 
+                            // "product_data": (estimate_form["product_name[]"]) ? [estimate_form["product_name[]"]].flat().map((name,
+                            //     i) => {
+                            //     // 1. Capture the values from parallel arrays using index [i]
+                            //     // We use Number() to ensure calculations work, and || 0 as a fallback
+
+                            //     if (name !== '') {
+
+
+                            //         const qty = Number([estimate_form["quantity[]"]].flat()[
+                            //             i] || '');
+                            //         const total = Number([estimate_form["product_total[]"]]
+                            //             .flat()[i] ||
+                            //             '');
+                            //         // const taxTotal = ( Number([estimate_form["producttaxrate[]"].flat()[i]] * Number([estimate_form["producttaxrate[]"].flat()[i]] ) ) / 100 || '');
+                            //         const taxTotal = (Number(estimate_form["product_total[]"].flat()[i]) * Number(estimate_form["producttaxrate[]"].flat()[i]) / 100) || '';
+                            //         const itemCode = [estimate_form["product_id[]"]].flat() ? [estimate_form["product_id[]"]].flat()[i] : "";
+                            //         const description = [estimate_form["product_description[]"]]
+                            //             .flat()[
+                            //             i
+                            //         ] || "";
+
+                            //         // 2. Calculate Unit Price (Total / Quantity)
+                            //         const unitPrice = qty > 0 ? (total / qty).toFixed(2) :
+                            //             "0.00";
+
+                            //         // 3. Return the row object
+                            //         return {
+                            //             "product_name": name,
+                            //             "product_item_code": itemCode,
+                            //             "hsn_value": "",
+                            //             "serial_no_value": "",
+                            //             "product_quantity": qty.toString(),
+                            //             "product_unit": "",
+                            //             "product_unitprice": unitPrice,
+                            //             "product_discount": "",
+                            //             "product_image": "",
+                            //             "product_used_tax": [{
+                            //                 "tax_name": estimate_form[
+                            //                     "producttaxname[]"][i] || "TAX",
+                            //                 "tax_amount": taxTotal,
+                            //                 "tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01",
+                            //                 "tax_rate":  Number([estimate_form["producttaxrate[]"]].flat()[i]),
+                            //                 "tax_types": "%"
+                            //             }],
+                            //             "product_amount":(total + taxTotal).toString(),
+                            //             "product_with_tax_amount": (total + taxTotal).toString(),
+                            //             "product_without_tax_amount": total.toString(),
+                            //             "product_inline_note": description,
+                            //             "product_tax_per_unit": null,
+                            //             "product_tax_total": taxTotal
+                            //         };
+                            //     }
+
+                            // }).filter(Boolean) : [],
+
+
                             "product_data": (
                                 estimate_form["product_name[]"]
                             )
@@ -1489,9 +1564,9 @@ $(document).ready(function (e) {
                                             ? estimate_form["quantity[]"]
                                             : [estimate_form["quantity[]"]];
 
-                                        const totalArr = Array.isArray(estimate_form["product_total[]"])
-                                            ? estimate_form["product_total[]"]
-                                            : [estimate_form["product_total[]"]];
+                                        const totalArr = Array.isArray(estimate_form["rate[]"])
+                                            ? estimate_form["rate[]"]
+                                            : [estimate_form["rate[]"]];
 
                                         const taxRateArr = Array.isArray(estimate_form["producttaxrate[]"])
                                             ? estimate_form["producttaxrate[]"]
@@ -1509,6 +1584,10 @@ $(document).ready(function (e) {
                                             ? estimate_form["producttaxname[]"]
                                             : [estimate_form["producttaxname[]"]];
 
+                                        const prd_total = Array.isArray(estimate_form["product_total[]"])
+                                            ? estimate_form["product_total[]"]
+                                            : [estimate_form["product_total[]"]];
+
                                         const qty = Number(quantityArr[i] || 0);
 
                                         const total = Number(totalArr[i] || 0);
@@ -1522,7 +1601,7 @@ $(document).ready(function (e) {
                                         const description = descArr[i] || "";
 
                                         const unitPrice = qty > 0
-                                            ? (total / qty).toFixed(2)
+                                            ? (total * qty).toFixed(2)
                                             : "0.00";
 
                                         return {
@@ -1532,21 +1611,21 @@ $(document).ready(function (e) {
                                             "serial_no_value": "",
                                             "product_quantity": qty.toString(),
                                             "product_unit": "",
-                                            "product_unitprice": unitPrice,
+                                            "product_unitprice": total,
                                             "product_discount": "",
                                             "product_image": "",
 
                                             "product_used_tax": [{
                                                 "tax_name": taxNameArr[i] || "TAX",
-                                                "tax_amount": taxTotal,
+                                                "tax_amount": Number(taxTotal * qty),
                                                 "tax_id": "82A4E33B-9598-44BA-A9FF-AA6A77218C01",
                                                 "tax_rate": taxRate,
                                                 "tax_types": "%"
                                             }],
 
-                                            "product_amount": (total + taxTotal).toString(),
-                                            "product_with_tax_amount": (total + taxTotal).toString(),
-                                            "product_without_tax_amount": total.toString(),
+                                            "product_amount": prd_total[i],
+                                            "product_with_tax_amount": (unitPrice + taxTotal).toString(),
+                                            "product_without_tax_amount": unitPrice.toString(),
                                             "product_inline_note": description,
                                             "product_tax_per_unit": null,
                                             "product_tax_total": taxTotal
@@ -1606,7 +1685,95 @@ $(document).ready(function (e) {
                             },
                             "sub_total_label": "Sub Total",
                             "total_inlinediscount_label": "Inline Discount",
-                            
+                            // tax detail for dynamic tax..
+
+
+                            //     "tax_detail": [
+                            //     // Product tax objects
+                            //     ...(Array.isArray(estimate_form["producttaxname[]"])
+                            //         ? estimate_form["producttaxname[]"]
+                            //         : [estimate_form["producttaxname[]"]]
+                            //     )
+                            //     .filter(name => name && String(name).trim() !== "") // ✅ REMOVE EMPTY VALUES
+                            //     .map((name, i) => {
+
+                            //         const productTaxRateArr = Array.isArray(estimate_form["producttaxrate[]"])
+                            //             ? estimate_form["producttaxrate[]"]
+                            //             : [estimate_form["producttaxrate[]"]];
+
+                            //         const rateArr = Array.isArray(estimate_form["rate[]"])
+                            //             ? estimate_form["rate[]"]
+                            //             : [estimate_form["rate[]"]];
+
+                            //         const quantityArr = Array.isArray(estimate_form["quantity[]"])
+                            //             ? estimate_form["quantity[]"]
+                            //             : [estimate_form["quantity[]"]];
+
+                            //         const rawRate = productTaxRateArr[i] || "0%";
+
+                            //         const ratePercentage = parseFloat(rawRate);
+
+                            //         const unitprice =
+                            //             (Number(rateArr[i] || 0) *
+                            //             Number(quantityArr[i] || 1));
+
+                            //         const taxValue = (unitprice * ratePercentage) / 100;
+
+                            //         window.totaltaxamount += taxValue;
+
+                            //         return {
+                            //             "tax_id": '',
+                            //             "tax_name": name,
+                            //             "tax_data": `${ratePercentage}%`,
+                            //             "tax_value": String(taxValue),
+                            //             "tax_on_header": "on",
+                            //             "tax_on_value": String(unitprice)
+                            //         };
+                            //     }),
+
+                            //     // Task tax objects
+                            //     ...(Array.isArray(estimate_form["tasktaxname[]"])
+                            //         ? estimate_form["tasktaxname[]"]
+                            //         : [estimate_form["tasktaxname[]"]]
+                            //     )
+                            //     .filter(name => name && String(name).trim() !== "") // ✅ REMOVE EMPTY VALUES
+                            //     .map((name, i) => {
+
+                            //         const taskTaxRateArr = Array.isArray(estimate_form["tasktaxrate[]"])
+                            //             ? estimate_form["tasktaxrate[]"]
+                            //             : [estimate_form["tasktaxrate[]"]];
+
+                            //         const taskRateArr = Array.isArray(estimate_form["task_rate[]"])
+                            //             ? estimate_form["task_rate[]"]
+                            //             : [estimate_form["task_rate[]"]];
+
+                            //         const taskQtyArr = Array.isArray(estimate_form["taskquantity[]"])
+                            //             ? estimate_form["taskquantity[]"]
+                            //             : [estimate_form["taskquantity[]"]];
+
+                            //         const rawRate = taskTaxRateArr[i] || "0%";
+
+                            //         const ratePercentage = parseFloat(rawRate);
+
+                            //         const unitprice =
+                            //             (Number(taskRateArr[i] || 0) *
+                            //             Number(taskQtyArr[i] || 1));
+
+                            //         const taxValue = (unitprice * ratePercentage) / 100;
+
+                            //         window.totaltaxamount += taxValue;
+
+                            //         return {
+                            //             "tax_id": '',
+                            //             "tax_name": name,
+                            //             "tax_data": `${ratePercentage}%`,
+                            //             "tax_value": String(taxValue),
+                            //             "tax_on_header": "on",
+                            //             "tax_on_value": String(unitprice)
+                            //         };
+                            //     })
+                            // ],
+
                             "tax_detail": (() => {
 
                                 const groupedTaxes = {};
@@ -1868,7 +2035,7 @@ $(document).ready(function (e) {
                         if (isInstantSaveCancelled) return;
                         // 2. Extract the Base64 string from the "base" key
                         // We split at the comma to remove "data:application/pdf;base64,"
-                        console.log(response);
+                        // console.log(response);
 
 
                         // Check if the server actually returned the PDF data
