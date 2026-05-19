@@ -303,7 +303,7 @@ function getScrollbarWidth() {
 // Open modal
 openBtn.addEventListener("click", (e) => {
     // Bypass modal if user has already submitted
-    if (localStorage.getItem('user_submit') == 'true' || window.user_submitted) {
+    if (localStorage.getItem('user_submit') == 'true' ) {
         const action = openBtn.getAttribute('data-action') || 'download';
         performDocumentAction(action);
         return;
@@ -337,7 +337,7 @@ const printBtn = document.getElementById("print-modal-trigger");
 if (printBtn) {
     printBtn.addEventListener("click", (e) => {
         // Bypass modal if user has already submitted
-        if (localStorage.getItem('user_submit') == 'true' || window.user_submitted) {
+        if (localStorage.getItem('user_submit') == 'true' ) {
             performDocumentAction('print');
             return;
         }
@@ -362,27 +362,33 @@ if (printBtn) {
 
 // Handle click on the modal button (Download or Print)
 const downloadModalBtn = document.getElementById("downloadModalBtn");
-if (downloadModalBtn) {
-    downloadModalBtn.addEventListener("click", () => {
-        const action = downloadModalBtn.getAttribute('data-action');
+    // if (downloadModalBtn) {
+    //     downloadModalBtn.addEventListener("click", () => {
+    //         const action = downloadModalBtn.getAttribute('data-action');
 
-        // console.log(action); 
+    //         // console.log(action); 
 
-        if (action === 'print') {
-            // Call the existing printPDF function
-            // printPDF();
+    //         if (validateField('all')){
+    //             if (action === 'print') {
+    //                 // Call the existing printPDF function
+    //                 // printPDF();
 
-            // Close the modal after triggering print
-            if (modal) modal.classList.remove("active");
-            document.body.style.overflow = "";
-            document.body.style.paddingRight = "";
-        } else {
-            // This is the default "Download" behavior
-            // The existing lead capture logic (if any) should go here
-            console.log("Download action triggered");
-        }
-    });
-}
+    //                 // Close the modal after triggering print
+    //                 if (modal) modal.classList.remove("active");
+    //                 document.body.style.overflow = "";
+    //                 document.body.style.paddingRight = "";
+    //             } else {
+    //                 // This is the default "Download" behavior
+    //                 // The existing lead capture logic (if any) should go here
+    //                 console.log("Download action triggered");
+    //             }
+    //         }
+
+            
+    //     });
+    // }
+
+
 
 // Close modal
 closeBtn.addEventListener("click", () => {
@@ -2035,7 +2041,7 @@ $(document).ready(function (e) {
                         if (isInstantSaveCancelled) return;
                         // 2. Extract the Base64 string from the "base" key
                         // We split at the comma to remove "data:application/pdf;base64,"
-                        // console.log(response);
+                        console.log(response);
 
 
                         // Check if the server actually returned the PDF data
@@ -2716,7 +2722,8 @@ function printPDF() {
 //-------------------------------------------------
 // download and print pdf code..
 //-------------------------------------------------
-function validateField(field) {
+
+ let validateField = (field) => {
     let isValid = true;
 
     if (field === 'name' || field === 'all') {
@@ -2728,10 +2735,11 @@ function validateField(field) {
         } else {
             $group.removeClass('error');
         }
+        // console.log('name fielf validation' , isValid);
     }
 
     if (field === 'email' || field === 'all') {
-        const email = $('#email').val().trim();
+        const email = $('#email1').val().trim();
         const $group = $('#emailGroup');
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email) {
@@ -2745,6 +2753,7 @@ function validateField(field) {
         } else {
             $group.removeClass('error');
         }
+        // console.log('email fielf validation' , isValid);
     }
 
     if (field === 'phone' || field === 'all') {
@@ -2756,6 +2765,7 @@ function validateField(field) {
         } else {
             $group.removeClass('error');
         }
+        // console.log('phone fielf validation' , isValid);
     }
 
     if (field === 'jobRole' || field === 'all') {
@@ -2767,19 +2777,22 @@ function validateField(field) {
         } else {
             $group.removeClass('error');
         }
+        // console.log('jobrole fielf validation' , isValid);
     }
 
     return isValid;
-}
+};
 
 $(document).ready(function () {
+
+    // $('#email').removeAttr('required');
     // Remove default error classes on page load
     $('.login-input-groups.error, .download-modal-field.error').removeClass('error');
 
     // Attach blur events
-    $('#name').on('blur', function () {
-        validateField('name');
-    });
+    // $('#name').on('blur', function () {
+    //     validateField('name');
+    // });
 
     // Job Role Selection Handler
     $('.download-modal-option').on('click', function () {
@@ -2803,18 +2816,24 @@ $(document).ready(function () {
 
     // Handle submission
     $('#downloadForm').on('submit', function (e) {
+        
+        
+
         e.preventDefault();
+        
+        
 
         const $btn = $('#downloadModalBtn');
         const action = $btn.attr('data-action');
 
         if (validateField('all')) {
+                
             const originalText = $btn.text();
             $btn.text('Processing...').prop('disabled', true);
 
             const formData = {
                 name: $('#name').val().trim(),
-                email: $('#email').val().trim(),
+                email: $('#email1').val().trim(),
                 phone: $('#phone').val().trim(),
                 designation: $('#jobRoleValue').text().trim(),
                 medium: "{{ $page_name }}"
