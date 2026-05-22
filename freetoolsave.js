@@ -1324,7 +1324,7 @@ $(document).ready(function (e) {
                             },
                             "business_no": "",
                             "billing_country": estimate_form.billing_country,
-                            "billing_pin_code": estimate_form.billing_po,
+                            "billing_pin_code": estimate_form.billing_zip_code,
                             "billing_address_label": page_name.charAt(0).toUpperCase() + page_name.slice(1) + "To:",
                             "billing_address_customer": "",
                             "firstname": "",
