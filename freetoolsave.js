@@ -1,3 +1,5 @@
+
+
 //--------------------------------------------------------------
 // generic initialization....
 //--------------------------------------------------------------
@@ -361,36 +363,7 @@ if (printBtn) {
 }
 
 // Handle click on the modal button (Download or Print)
-const downloadModalBtn = document.getElementById("downloadModalBtn");
-    // if (downloadModalBtn) {
-    //     downloadModalBtn.addEventListener("click", () => {
-    //         const action = downloadModalBtn.getAttribute('data-action');
-
-    //         // console.log(action); 
-
-    //         if (validateField('all')){
-    //             if (action === 'print') {
-    //                 // Call the existing printPDF function
-    //                 // printPDF();
-
-    //                 // Close the modal after triggering print
-    //                 if (modal) modal.classList.remove("active");
-    //                 document.body.style.overflow = "";
-    //                 document.body.style.paddingRight = "";
-    //             } else {
-    //                 // This is the default "Download" behavior
-    //                 // The existing lead capture logic (if any) should go here
-    //                 console.log("Download action triggered");
-    //             }
-    //         }
-
-            
-    //     });
-    // }
-
-
-
-// Close modal
+const downloadModalBtn = document.getElementById("downloadModalBtn")// Close modal
 closeBtn.addEventListener("click", () => {
     modal.classList.remove("active");
     jobValue.innerText = "";
@@ -408,7 +381,8 @@ closeBtn.addEventListener("click", () => {
 });
 // custom js for field
 
-const countries = [{
+const countriesFT = [
+    {
     name: 'Afghanistan',
     code: '+93',
     iso: 'af'
@@ -505,33 +479,33 @@ const countries = [{
 }
 ];
 
-const list = document.getElementById('countryList');
-countries.forEach(c => {
+const listFT = document.getElementById('countryListFT');
+countriesFT.forEach(c => {
     const li = document.createElement('li');
     li.className = 'login-country-item';
-    li.onclick = () => selectCountry(c.name, c.code, c.iso);
+    li.onclick = () => selectCountryFT(c.name, c.code, c.iso);
     li.innerHTML = `
                     <img src="https://flagcdn.com/w20/${c.iso}.png" class="login-flag-icon" style="margin-right: 12px;">
                     <span class="login-country-name">${c.name}</span>
                     <span class="login-country-code">${c.code}</span>
                 `;
-    list.appendChild(li);
+    listFT.appendChild(li);
 });
 
-function toggleDropdown(e) {
+function toggleDropdownFT(e) {
     e.stopPropagation();
-    document.getElementById('countryDropdown').classList.toggle('show');
-    document.getElementById('countrySearch').focus();
+    document.getElementById('countryDropdownFT').classList.toggle('show');
+    document.getElementById('countrySearchFT').focus();
 }
 
-function selectCountry(name, code, iso) {
-    document.getElementById('selectedFlag').src = `https://flagcdn.com/w20/${iso}.png`;
-    document.getElementById('selectedCode').innerText = code;
-    document.getElementById('countryDropdown').classList.remove('show');
+function selectCountryFT(name, code, iso) {
+    document.getElementById('selectedFlagFT').src = `https://flagcdn.com/w20/${iso}.png`;
+    document.getElementById('selectedCodeFT').innerText = code;
+    document.getElementById('countryDropdownFT').classList.remove('show');
 }
 
-function filterCountries() {
-    const val = document.getElementById('countrySearch').value.toLowerCase();
+function filterCountriesFT() {
+    const val = document.getElementById('countrySearchFT').value.toLowerCase();
     document.querySelectorAll('.login-country-item').forEach(item => {
         const text = item.textContent.toLowerCase();
         item.style.display = text.includes(val) ? 'flex' : 'none';
@@ -539,7 +513,7 @@ function filterCountries() {
 }
 
 
-window.onclick = () => document.getElementById('countryDropdown').classList.remove('show');
+window.onclick = () => document.getElementById('countryDropdownFT').classList.remove('show');
 
 
 
@@ -2836,7 +2810,7 @@ $(document).ready(function () {
                 email: $('#email1').val().trim(),
                 phone: $('#phone').val().trim(),
                 designation: $('#jobRoleValue').text().trim(),
-                medium: "{{ $page_name }}"
+                medium: window.location.href
             };
 
             const jsonString = JSON.stringify(formData);
@@ -2909,3 +2883,4 @@ $(document).on('click', '.invTpl-apply', function () {
     // Optional: Close the modal after applying
     invTplClose();
 });
+
